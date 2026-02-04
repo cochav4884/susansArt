@@ -1,0 +1,193 @@
+:root {
+  --red-dark: #8b1e1e;
+  --red-main: #b02a2a;
+  --red-soft: #f2dede;
+
+  --grey-dark: #1a1a1a;
+  --grey-medium: #6c757d;
+  --grey-light: #f5f5f5;
+
+  --white: #ffffff;
+}
+
+/* RESET */
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--grey-light);
+  color: var(--grey-dark);
+}
+
+/* NAV HEADER */
+
+header.nav {
+  background: #8b1e1e;          /* deep red */
+  color: #ffffff;
+  padding: 1rem;
+}
+
+.nav-brand {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* MAIN CONTENT */
+.reading-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.book-title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* ART SELECTION DROPDOWN */
+.reading-container select.form-select {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  border: 2px solid var(--red-main);
+  background: var(--red-soft);
+  color: var(--grey-dark);
+  font-size: 1rem;
+}
+
+.reading-container select.form-select:focus {
+  outline: none;
+  border-color: var(--red-dark);
+}
+
+/* ART IMAGE VIEWER */
+.art-viewer {
+  text-align: center;
+}
+
+#artImage {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 16px;
+  border: 2px solid var(--grey-medium);
+  background: var(--white);
+  margin-top: 1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+/* BACK TO TOP BUTTON */
+#backToTop {
+  display: none;
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  z-index: 99;
+  background: var(--red-dark);
+  color: var(--white);
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: background 0.3s;
+}
+
+#backToTop:hover {
+  background: var(--grey-dark);
+}
+
+/* FOOTER */
+.site-footer {
+  background: var(--grey-dark);
+  color: var(--white);
+  text-align: center;
+  padding: 1.25rem;
+  margin-top: 2rem;
+}
+
+.site-footer a {
+  color: var(--red-soft);
+  text-decoration: none;
+  margin: 0 0.5rem;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .nav .back-btn {
+    align-self: flex-start;
+  }
+
+  .nav .nav-brand {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .reading-container {
+    padding: 1rem;
+  }
+
+  .site-footer p {
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+  }
+}
+
+/*=============================
+ART VIEWER SPECIFIC STYLES
+==============================*/
+    .art-viewer {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .art-viewer img {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 12px;
+      border: 2px solid #ccc;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .back-btn {
+      color: #fff;
+      text-decoration: none;
+      margin-right: 1rem;
+    }
+
+    .art-image-container {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+    .art-image-container button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(255,0,0,0.7);
+      border: none;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+  
