@@ -13,6 +13,7 @@ header.nav {
   background: #8b1e1e;          /* deep red */
   color: #ffffff;
   padding: 1rem;
+  margin-bottom: 2rem;
 }
 
 .nav-brand {
@@ -176,6 +177,7 @@ input:focus {
   border-radius: 16px;
   flex-wrap: wrap;
   margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .jumbotron-avatar {
@@ -196,4 +198,8 @@ input:focus {
 .jumbotron div p {
   margin: 0;
   color: #4d0000;  /* slightly lighter red for subtitle */
+}
+
+main {
+  margin-top: 2rem;
 }
