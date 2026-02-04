@@ -1,38 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Art Gallery</title>
+  <meta charset="UTF-8" />
+  <title>Art Tracker</title>
 
-  <link rel="icon" type="image/png" href="public/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
-<link rel="shortcut icon" href="public/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="public/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="susansArt" />
-<link rel="manifest" href="public/site.webmanifest" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-
- <link rel="stylesheet" href="styles/index.css">
- 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles/index.css">
 </head>
+
 <body>
 
- 
-
-    <header class="nav">
-    <a href="index.html" class="back-btn">
-        <img src="public/favicon.ico" alt="Art Tracker Logo" class="nav-avatar"></a>
-    <span class="nav-brand">🎨 Art Gallery</span>
-   </header>
-
- 
+<header class="nav">
+  <span class="nav-brand">🎨 Art Tracker</span>
+</header>
 
 <section class="jumbotron">
-  <img src="images/susan.jpg" alt="Artist Susan" class="jumbotron-avatar">
   <div>
     <h1>Artist: Susan</h1>
-    <p>Track your artwork and creative progress.</p>
+    <p>Track every art project from idea to completion.</p>
   </div>
 </section>
 
@@ -40,125 +26,190 @@
   <section id="cardsContainer"></section>
 
   <div class="controls">
-    <button class="btn" id="addCard">➕ Add Artwork</button>
-    <button class="btn" id="resetAll">🔄 Reset All</button>
+    <button id="addCard">➕ Add Project</button>
+    <button id="resetAll">🔄 Reset All</button>
   </div>
 </main>
 
-<footer class="site-footer">
-  <p>Artist: Susan | <span id="year"></span></p>
-  <p>
-    <a href="privacyPolicy.html">🔒 Privacy Policy</a> |
-    <a href="legalDisclaimer.html">⚖️ Legal Disclaimer</a>
-  </p>
+<footer>
+  <p>Art Tracker | <span id="year"></span></p>
 </footer>
 
 <script>
-const STORAGE_KEY = "simpleArtCards";
+  const STORAGE_KEY = "artCards";
+  const STAGES = ["Concept", "Sketch", "In Progress", "Details", "Completed"];
 
-function emptyCard() {
-  return {
-    title: "",
-    date: "",
-    medium: "",
-    notes: ""
-  };
-}
-
-function loadCards() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [emptyCard()];
-}
-
-function saveCards(cards) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-}
-
-function renderCards() {
-  const container = document.getElementById("cardsContainer");
-  container.innerHTML = "";
-  const cards = loadCards();
-
-  cards.forEach((card, index) => {
-    const el = document.createElement("div");
-    el.className = "art-card";
-
-    el.innerHTML = `
-      <input class="title" placeholder="Artwork Name" value="${card.title}">
-      
-      <label>
-        Date
-        <input type="date" value="${card.date}">
-      </label>
-
-      <label>
-        Medium
-        <select>
-          <option value="">Select</option>
-          ${["Pencil","Paint","Digital","Charcoal","Mixed Media","Other"]
-            .map(m => `<option ${card.medium===m?"selected":""}>${m}</option>`)
-            .join("")}
-        </select>
-      </label>
-
-      <textarea placeholder="Notes about this artwork...">${card.notes}</textarea>
-
-      <div class="card-actions">
-        <button class="btn view">🖼️ View Art</button>
-        <button class="btn reset">🔄 Reset</button>
-      </div>
-    `;
-
-    el.querySelector(".title").oninput = e => {
-      cards[index].title = e.target.value;
-      saveCards(cards);
+  function createEmptyCard() {
+    return {
+      title: "",
+      stages: Array(5).fill(false),
+      images: Array(5).fill(null).map(() => []),
+      startDate: "",
+      completionDate: "",
+      medium: "",
+      notes: ""
     };
-
-    el.querySelector("input[type=date]").onchange = e => {
-      cards[index].date = e.target.value;
-      saveCards(cards);
-    };
-
-    el.querySelector("select").onchange = e => {
-      cards[index].medium = e.target.value;
-      saveCards(cards);
-    };
-
-    el.querySelector("textarea").onblur = e => {
-      cards[index].notes = e.target.value;
-      saveCards(cards);
-    };
-
-    el.querySelector(".reset").onclick = () => {
-      cards[index] = emptyCard();
-      saveCards(cards);
-      renderCards();
-    };
-
-    el.querySelector(".view").onclick = () => {
-      window.location.href = "art.html";
-    };
-
-    container.appendChild(el);
-  });
-}
-
-document.getElementById("addCard").onclick = () => {
-  const cards = loadCards();
-  cards.push(emptyCard());
-  saveCards(cards);
-  renderCards();
-};
-
-document.getElementById("resetAll").onclick = () => {
-  if (confirm("Reset all artwork cards?")) {
-    localStorage.removeItem(STORAGE_KEY);
-    renderCards();
   }
-};
 
-document.getElementById("year").textContent = new Date().getFullYear();
-renderCards();
+  function loadCards() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [createEmptyCard()];
+  }
+
+  function saveCards(cards) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+  }
+
+  function resizeImage(file, callback) {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = e => img.src = e.target.result;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const max = 800;
+      let { width, height } = img;
+
+      if (width > height && width > max) {
+        height *= max / width;
+        width = max;
+      } else if (height > max) {
+        width *= max / height;
+        height = max;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL("image/jpeg", 0.8));
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  function renderCards() {
+    const container = document.getElementById("cardsContainer");
+    container.innerHTML = "";
+    const cards = loadCards();
+
+    cards.forEach((card, index) => {
+      const cardEl = document.createElement("div");
+      cardEl.className = "art-card";
+
+      cardEl.innerHTML = `
+        <div class="title-container">
+          <input class="title" placeholder="Project Title" value="${card.title}">
+          <button class="btn delete">🗑️</button>
+        </div>
+
+        <div class="stages">
+          ${STAGES.map((s,i)=>`
+            <div class="stage-block">
+              <label>
+                <input type="checkbox" ${card.stages[i] ? "checked" : ""}>
+                ${s}
+              </label>
+              <input type="file" accept="image/*" data-stage="${i}">
+              <div class="image-preview">
+                ${(card.images[i] || []).map(img=>`<img src="${img}">`).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+
+        <div class="extras">
+          <label>Medium
+            <select class="medium">
+              <option value="">Select</option>
+              ${["Pencil","Paint","Digital","Charcoal","Mixed Media","Other"]
+                .map(m=>`<option ${card.medium===m?"selected":""}>${m}</option>`).join("")}
+            </select>
+          </label>
+
+          <label>Start Date <input type="date" value="${card.startDate}"></label>
+          <label>Completion Date <input type="date" value="${card.completionDate}"></label>
+        </div>
+
+        <textarea placeholder="Notes, ideas, reflections...">${card.notes}</textarea>
+
+        <button class="btn reset">🔄 Reset This Project</button>
+      `;
+
+      cardEl.querySelector(".title").onblur = e => {
+        cards[index].title = e.target.value;
+        saveCards(cards);
+      };
+
+      cardEl.querySelector(".delete").onclick = () => {
+        if (confirm("Delete this project?")) {
+          cards.splice(index,1);
+          saveCards(cards);
+          renderCards();
+        }
+      };
+
+      cardEl.querySelectorAll(".stages input[type=checkbox]").forEach((box,i)=>{
+        box.onchange = e => {
+          cards[index].stages[i] = e.target.checked;
+          saveCards(cards);
+        };
+      });
+
+      cardEl.querySelectorAll("input[type=file]").forEach(input=>{
+        input.onchange = e => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const stage = e.target.dataset.stage;
+          resizeImage(file, img=>{
+            cards[index].images[stage].push(img);
+            saveCards(cards);
+            renderCards();
+          });
+        };
+      });
+
+      cardEl.querySelector(".medium").onchange = e => {
+        cards[index].medium = e.target.value;
+        saveCards(cards);
+      };
+
+      const dateInputs = cardEl.querySelectorAll("input[type=date]");
+      dateInputs[0].onchange = e => cards[index].startDate = e.target.value;
+      dateInputs[1].onchange = e => cards[index].completionDate = e.target.value;
+      dateInputs.forEach(i=>i.onchange = ()=>saveCards(cards));
+
+      cardEl.querySelector("textarea").onblur = e => {
+        cards[index].notes = e.target.value;
+        saveCards(cards);
+      };
+
+      cardEl.querySelector(".reset").onclick = () => {
+        cards[index] = createEmptyCard();
+        saveCards(cards);
+        renderCards();
+      };
+
+      container.appendChild(cardEl);
+    });
+  }
+
+  document.getElementById("addCard").onclick = () => {
+    const cards = loadCards();
+    cards.push(createEmptyCard());
+    saveCards(cards);
+    renderCards();
+  };
+
+  document.getElementById("resetAll").onclick = () => {
+    if (confirm("Reset all projects?")) {
+      localStorage.removeItem(STORAGE_KEY);
+      renderCards();
+    }
+  };
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+  renderCards();
 </script>
 
 </body>
