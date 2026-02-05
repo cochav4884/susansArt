@@ -52,7 +52,9 @@
 <script>
 const STORAGE_KEY = "artCards";
 const STAGES = ["Concept", "Sketch", "In Progress", "Original", "Completed"];
+const MEDIUMS = ["Pencil","Paint","Digital","Charcoal","Pen","Sharpie","Marker","Gel Pen","White Out"];
 
+// Create empty card object
 function createEmptyCard() {
   return {
     title: "",
@@ -60,20 +62,23 @@ function createEmptyCard() {
     images: Array(5).fill(null).map(() => []),
     startDate: "",
     completionDate: "",
-    medium: "",
+    medium: [],   // array now for multiple selections
     notes: ""
   };
 }
 
+// Load from localStorage
 function loadCards() {
   const data = localStorage.getItem(STORAGE_KEY);
   return data ? JSON.parse(data) : [createEmptyCard()];
 }
 
+// Save to localStorage
 function saveCards(cards) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
 }
 
+// Resize images
 function resizeImage(file, callback) {
   const img = new Image();
   const reader = new FileReader();
@@ -102,6 +107,7 @@ function resizeImage(file, callback) {
   reader.readAsDataURL(file);
 }
 
+// Render all cards
 function renderCards() {
   const container = document.getElementById("cardsContainer");
   container.innerHTML = "";
@@ -109,65 +115,69 @@ function renderCards() {
 
   cards.forEach((card, index) => {
     const cardEl = document.createElement("div");
-    cardEl.className = "art-card";
+    cardEl.className = "art-card collapsed"; // start collapsed
 
     const isCompleted = card.stages[4] === true;
 
-cardEl.innerHTML = `
-  <div class="title-container">
-    <input class="title" placeholder="Project Title" value="${card.title}">
-    <button class="btn delete">🗑️</button>
-  </div>
-
-  <div class="card-content">
-    <div class="stages">
-      ${STAGES.map((s,i)=>`
-        <div class="stage-block">
-          <label>
-            <input type="checkbox" ${card.stages[i] ? "checked" : ""}>
-            ${s}
-          </label>
-          <input type="file" accept="image/*" data-stage="${i}" multiple>
-          <div class="image-preview">
-            ${(card.images[i] || []).map((img, imgIndex) => `
-              <div class="preview-container">
-                <img src="${img}" alt="Stage ${s} Image">
-                <button class="remove-image" data-stage="${i}" data-index="${imgIndex}">❌</button>
-              </div>
-            `).join("")}
-          </div>
-        </div>
-      `).join("")}
-    </div>
-
-    <div class="extras">
-      <label>Medium
-        <select class="medium">
-          <option value="">Select</option>
-          ${["Pencil","Paint","Digital","Charcoal","Mixed Media","Other"]
-            .map(m=>`<option ${card.medium===m?"selected":""}>${m}</option>`).join("")}
-        </select>
+    // Medium checkboxes
+    const mediumHTML = MEDIUMS.map(m => `
+      <label>
+        <input type="checkbox" value="${m}" ${card.medium.includes(m) ? "checked" : ""}>
+        ${m}
       </label>
+    `).join("");
 
-      <label>Start Date <input type="date" value="${card.startDate}"></label>
-      <label>Completion Date <input type="date" value="${card.completionDate}"></label>
-    </div>
+    cardEl.innerHTML = `
+      <div class="title-container">
+        <input class="title" placeholder="Project Title" value="${card.title}">
+        <button class="btn delete">🗑️</button>
+      </div>
 
-    <textarea placeholder="Notes, ideas, reflections...">${card.notes}</textarea>
+      <div class="card-content">
+        <div class="stages">
+          ${STAGES.map((s,i)=>`
+            <div class="stage-block">
+              <label>
+                <input type="checkbox" ${card.stages[i] ? "checked" : ""}>
+                ${s}
+              </label>
+              <input type="file" accept="image/*" data-stage="${i}" multiple>
+              <div class="image-preview">
+                ${(card.images[i] || []).map((img, imgIndex) => `
+                  <div class="preview-container">
+                    <img src="${img}" alt="Stage ${s} Image">
+                    <button class="remove-image" data-stage="${i}" data-index="${imgIndex}">❌</button>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
 
-    <div class="card-actions">
-      <button class="btn view-art" style="display:${isCompleted ? "inline-block" : "none"}">🎨 View Art</button>
-      <button class="btn reset">🔄 Reset This Project</button>
-    </div>
-  </div>
-`;
+        <fieldset class="medium">
+          <legend>Medium</legend>
+          ${mediumHTML}
+        </fieldset>
 
-// Toggle collapse when title container is clicked
-cardEl.querySelector(".title-container").onclick = e => {
-  if (e.target.classList.contains("delete")) return; // don't toggle if delete clicked
-  cardEl.classList.toggle("collapsed");
-};
+        <div class="extras">
+          <label>Start Date <input type="date" value="${card.startDate}"></label>
+          <label>Completion Date <input type="date" value="${card.completionDate}"></label>
+        </div>
 
+        <textarea placeholder="Notes, ideas, reflections...">${card.notes}</textarea>
+
+        <div class="card-actions">
+          <button class="btn view-art" style="display:${isCompleted ? "inline-block" : "none"}">🎨 View Art</button>
+          <button class="btn reset">🔄 Reset This Project</button>
+        </div>
+      </div>
+    `;
+
+    // Toggle collapse
+    cardEl.querySelector(".title-container").onclick = e => {
+      if (e.target.classList.contains("delete")) return;
+      cardEl.classList.toggle("collapsed");
+    };
 
     // Title
     cardEl.querySelector(".title").onblur = e => {
@@ -175,7 +185,7 @@ cardEl.querySelector(".title-container").onclick = e => {
       saveCards(cards);
     };
 
-    // Delete project
+    // Delete
     cardEl.querySelector(".delete").onclick = () => {
       if (confirm("Delete this project?")) {
         cards.splice(index,1);
@@ -188,11 +198,9 @@ cardEl.querySelector(".title-container").onclick = e => {
     cardEl.querySelectorAll(".stages input[type=checkbox]").forEach((box,i)=>{
       box.onchange = e => {
         cards[index].stages[i] = e.target.checked;
-
         if (STAGES[i] === "Completed" && e.target.checked) {
           cards[index].completionDate = new Date().toISOString().split("T")[0];
         }
-
         saveCards(cards);
         renderCards();
       };
@@ -210,7 +218,7 @@ cardEl.querySelector(".title-container").onclick = e => {
             renderCards();
           });
         });
-        e.target.value = ""; // reset input
+        e.target.value = "";
       };
     });
 
@@ -225,33 +233,28 @@ cardEl.querySelector(".title-container").onclick = e => {
       }
     });
 
-    // Medium
-    cardEl.querySelector(".medium").onchange = e => {
-      cards[index].medium = e.target.value;
-      saveCards(cards);
-    };
+    // Medium checkboxes
+    cardEl.querySelectorAll("fieldset.medium input[type=checkbox]").forEach(cb => {
+      cb.onchange = e => {
+        if (e.target.checked) {
+          if (!cards[index].medium.includes(e.target.value)) cards[index].medium.push(e.target.value);
+        } else {
+          cards[index].medium = cards[index].medium.filter(m => m !== e.target.value);
+        }
+        saveCards(cards);
+      };
+    });
 
     // Dates
     const dateInputs = cardEl.querySelectorAll("input[type=date]");
-    dateInputs[0].onchange = e => {
-      cards[index].startDate = e.target.value;
-      saveCards(cards);
-    };
-    dateInputs[1].onchange = e => {
-      cards[index].completionDate = e.target.value;
-      saveCards(cards);
-    };
+    dateInputs[0].onchange = e => { cards[index].startDate = e.target.value; saveCards(cards); };
+    dateInputs[1].onchange = e => { cards[index].completionDate = e.target.value; saveCards(cards); };
 
     // Notes
-    cardEl.querySelector("textarea").onblur = e => {
-      cards[index].notes = e.target.value;
-      saveCards(cards);
-    };
+    cardEl.querySelector("textarea").onblur = e => { cards[index].notes = e.target.value; saveCards(cards); };
 
     // View Art
-    cardEl.querySelector(".view-art").onclick = () => {
-      window.location.href = "art.html";
-    };
+    cardEl.querySelector(".view-art").onclick = () => { window.location.href = "art.html"; };
 
     // Reset project
     cardEl.querySelector(".reset").onclick = () => {
@@ -264,13 +267,15 @@ cardEl.querySelector(".title-container").onclick = e => {
   });
 }
 
+// Add new card
 document.getElementById("addCard").onclick = () => {
   const cards = loadCards();
-  cards.push(createEmptyCard()); // ✅ fixed parentheses
+  cards.push(createEmptyCard());
   saveCards(cards);
   renderCards();
 };
 
+// Reset all
 document.getElementById("resetAll").onclick = () => {
   if (confirm("Reset all projects?")) {
     localStorage.removeItem(STORAGE_KEY);

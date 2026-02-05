@@ -189,3 +189,41 @@ footer {
   background: var(--grey-dark);
   color: var(--white);
 }
+
+/* Medium checkboxes */
+fieldset.medium {
+  border: 1px solid var(--grey-medium);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  background: #fafafa;
+}
+
+fieldset.medium legend {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+fieldset.medium label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+fieldset.medium input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Make medium field responsive */
+@media (max-width: 600px) {
+  fieldset.medium label {
+    display: block;
+    margin-right: 0;
+  }
+}
