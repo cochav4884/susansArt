@@ -246,6 +246,13 @@ main {
       align-items: center;
     }
 
+    .artist-name {
+  font-family: 'Bookman Old Style', serif;
+  font-size: 2.2rem; /* adjust as needed */
+  color: var(--red-dark); /* optional */
+}
+
+
     main {
       padding: 2rem;
     }

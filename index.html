@@ -22,13 +22,14 @@
   <a href="index.html" class="back-btn">
     <img src="public/favicon.ico" alt="Art Tracker Logo" class="nav-avatar">
   </a>
-  <span class="nav-brand"> Art Tracker </span>
+  <span class="nav-brand">Art Tracker</span>
 </header>
 
 <section class="jumbotron">
   <div>
     <img src="images/susan.jpg" alt="Picture of Artist Susan" class="jumbotron-avatar">
-    <h1>Artist: Susan</h1>
+    <h1>Artist: <span class="artist-name">Susan</span></h1>
+
     <p>Track every art project from idea to completion.</p>
   </div>
 </section>
@@ -51,207 +52,212 @@
 </footer>
 
 <script>
-  const STORAGE_KEY = "artCards";
-  const STAGES = ["Concept", "Sketch", "In Progress", "Details", "Completed"];
+const STORAGE_KEY = "artCards";
+const STAGES = ["Concept", "Sketch", "In Progress", "Original", "Completed"];
 
-  function createEmptyCard() {
-    return {
-      title: "",
-      stages: Array(5).fill(false),
-      images: Array(5).fill(null).map(() => []),
-      startDate: "",
-      completionDate: "",
-      medium: "",
-      notes: ""
-    };
-  }
+function createEmptyCard() {
+  return {
+    title: "",
+    stages: Array(5).fill(false),
+    images: Array(5).fill(null).map(() => []),
+    startDate: "",
+    completionDate: "",
+    medium: "",
+    notes: ""
+  };
+}
 
-  function loadCards() {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [createEmptyCard()];
-  }
+function loadCards() {
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [createEmptyCard()];
+}
 
-  function saveCards(cards) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-  }
+function saveCards(cards) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+}
 
-  function resizeImage(file, callback) {
-    const img = new Image();
-    const reader = new FileReader();
+function resizeImage(file, callback) {
+  const img = new Image();
+  const reader = new FileReader();
 
-    reader.onload = e => img.src = e.target.result;
+  reader.onload = e => img.src = e.target.result;
 
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const max = 800;
-      let { width, height } = img;
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    const max = 800;
+    let { width, height } = img;
 
-      if (width > height && width > max) {
-        height *= max / width;
-        width = max;
-      } else if (height > max) {
-        width *= max / height;
-        height = max;
-      }
+    if (width > height && width > max) {
+      height *= max / width;
+      width = max;
+    } else if (height > max) {
+      width *= max / height;
+      height = max;
+    }
 
-      canvas.width = width;
-      canvas.height = height;
-      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-      callback(canvas.toDataURL("image/jpeg", 0.8));
-    };
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+    callback(canvas.toDataURL("image/jpeg", 0.8));
+  };
 
-    reader.readAsDataURL(file);
-  }
+  reader.readAsDataURL(file);
+}
 
-  function renderCards() {
-    const container = document.getElementById("cardsContainer");
-    container.innerHTML = "";
-    const cards = loadCards();
+function renderCards() {
+  const container = document.getElementById("cardsContainer");
+  container.innerHTML = "";
+  const cards = loadCards();
 
-    cards.forEach((card, index) => {
-      const cardEl = document.createElement("div");
-      cardEl.className = "art-card";
+  cards.forEach((card, index) => {
+    const cardEl = document.createElement("div");
+    cardEl.className = "art-card";
 
-      const isCompleted = card.stages[4] === true;
+    const isCompleted = card.stages[4] === true;
 
-      cardEl.innerHTML = `
-        <div class="title-container">
-          <input class="title" placeholder="Project Title" value="${card.title}">
-          <button class="btn delete">🗑️</button>
-        </div>
+    cardEl.innerHTML = `
+      <div class="title-container">
+        <input class="title" placeholder="Project Title" value="${card.title}">
+        <button class="btn delete">🗑️</button>
+      </div>
 
-        <div class="stages">
-          ${STAGES.map((s,i)=>`
-            <div class="stage-block">
-              <label>
-                <input type="checkbox" ${card.stages[i] ? "checked" : ""}>
-                ${s}
-              </label>
-              <input type="file" accept="image/*" data-stage="${i}">
-              <div class="image-preview">
-                ${(card.images[i] || []).map(img=>`<img src="${img}">`).join("")}
-              </div>
+      <div class="stages">
+        ${STAGES.map((s,i)=>`
+          <div class="stage-block">
+            <label>
+              <input type="checkbox" ${card.stages[i] ? "checked" : ""}>
+              ${s}
+            </label>
+            <input type="file" accept="image/*" data-stage="${i}">
+            <div class="image-preview">
+              ${(card.images[i] || []).map(img=>`<img src="${img}">`).join("")}
             </div>
-          `).join("")}
-        </div>
+          </div>
+        `).join("")}
+      </div>
 
-        <div class="extras">
-          <label>Medium
-            <select class="medium">
-              <option value="">Select</option>
-              ${["Pencil","Paint","Digital","Charcoal","Mixed Media","Other"]
-                .map(m=>`<option ${card.medium===m?"selected":""}>${m}</option>`).join("")}
-            </select>
-          </label>
+      <div class="extras">
+        <label>Medium
+          <select class="medium">
+            <option value="">Select</option>
+            ${["Pencil","Paint","Digital","Charcoal","Mixed Media","Other"]
+              .map(m=>`<option ${card.medium===m?"selected":""}>${m}</option>`).join("")}
+          </select>
+        </label>
 
-          <label>Start Date <input type="date" value="${card.startDate}"></label>
-          <label>Completion Date <input type="date" value="${card.completionDate}"></label>
-        </div>
+        <label>Start Date <input type="date" value="${card.startDate}"></label>
+        <label>Completion Date <input type="date" value="${card.completionDate}"></label>
+      </div>
 
-        <textarea placeholder="Notes, ideas, reflections...">${card.notes}</textarea>
+      <textarea placeholder="Notes, ideas, reflections...">${card.notes}</textarea>
 
-        <div class="card-actions">
-          <button class="btn view-art" style="display:${isCompleted ? "inline-block" : "none"}">
-            🎨 View Art
-          </button>
-          <button class="btn reset">🔄 Reset This Project</button>
-        </div>
-      `;
+      <div class="card-actions">
+        <button class="btn view-art" style="display:${isCompleted ? "inline-block" : "none"}">
+          🎨 View Art
+        </button>
+        <button class="btn reset">🔄 Reset This Project</button>
+      </div>
+    `;
 
-      /* Title */
-      cardEl.querySelector(".title").onblur = e => {
-        cards[index].title = e.target.value;
-        saveCards(cards);
-      };
+    /* Title */
+    cardEl.querySelector(".title").onblur = e => {
+      cards[index].title = e.target.value;
+      saveCards(cards);
+    };
 
-      /* Delete */
-      cardEl.querySelector(".delete").onclick = () => {
-        if (confirm("Delete this project?")) {
-          cards.splice(index,1);
-          saveCards(cards);
-          renderCards();
-        }
-      };
-
-      /* Stage checkboxes */
-      cardEl.querySelectorAll(".stages input[type=checkbox]").forEach((box,i)=>{
-        box.onchange = e => {
-          cards[index].stages[i] = e.target.checked;
-
-          // If Completed checked → set completion date
-          if (STAGES[i] === "Completed" && e.target.checked) {
-            cards[index].completionDate = new Date().toISOString().split("T")[0];
-          }
-
-          saveCards(cards);
-          renderCards(); // re-render to show/hide View Art button
-        };
-      });
-
-      /* Image upload */
-      cardEl.querySelectorAll("input[type=file]").forEach(input=>{
-        input.onchange = e => {
-          const file = e.target.files[0];
-          if (!file) return;
-          const stage = e.target.dataset.stage;
-          resizeImage(file, img=>{
-            cards[index].images[stage].push(img);
-            saveCards(cards);
-            renderCards();
-          });
-        };
-      });
-
-      /* Medium */
-      cardEl.querySelector(".medium").onchange = e => {
-        cards[index].medium = e.target.value;
-        saveCards(cards);
-      };
-
-      /* Dates */
-      const dateInputs = cardEl.querySelectorAll("input[type=date]");
-      dateInputs[0].onchange = e => cards[index].startDate = e.target.value;
-      dateInputs[1].onchange = e => cards[index].completionDate = e.target.value;
-      dateInputs.forEach(i=>i.onchange = ()=>saveCards(cards));
-
-      /* Notes */
-      cardEl.querySelector("textarea").onblur = e => {
-        cards[index].notes = e.target.value;
-        saveCards(cards);
-      };
-
-      /* View Art */
-      cardEl.querySelector(".view-art").onclick = () => {
-        window.location.href = "art.html";
-      };
-
-      /* Reset project */
-      cardEl.querySelector(".reset").onclick = () => {
-        cards[index] = createEmptyCard();
+    /* Delete */
+    cardEl.querySelector(".delete").onclick = () => {
+      if (confirm("Delete this project?")) {
+        cards.splice(index,1);
         saveCards(cards);
         renderCards();
+      }
+    };
+
+    /* Stage checkboxes */
+    cardEl.querySelectorAll(".stages input[type=checkbox]").forEach((box,i)=>{
+      box.onchange = e => {
+        cards[index].stages[i] = e.target.checked;
+
+        // If Completed checked → set completion date
+        if (STAGES[i] === "Completed" && e.target.checked) {
+          cards[index].completionDate = new Date().toISOString().split("T")[0];
+        }
+
+        saveCards(cards);
+        renderCards(); // re-render to show/hide View Art button
       };
-
-      container.appendChild(cardEl);
     });
-  }
 
-  document.getElementById("addCard").onclick = () => {
-    const cards = loadCards();
-    cards.push(createEmptyCard());
-    saveCards(cards);
-    renderCards();
-  };
+    /* Image upload */
+    cardEl.querySelectorAll("input[type=file]").forEach(input=>{
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const stage = e.target.dataset.stage;
+        resizeImage(file, img=>{
+          cards[index].images[stage].push(img);
+          saveCards(cards);
+          renderCards();
+        });
+      };
+    });
 
-  document.getElementById("resetAll").onclick = () => {
-    if (confirm("Reset all projects?")) {
-      localStorage.removeItem(STORAGE_KEY);
+    /* Medium */
+    cardEl.querySelector(".medium").onchange = e => {
+      cards[index].medium = e.target.value;
+      saveCards(cards);
+    };
+
+    /* Dates */
+    const dateInputs = cardEl.querySelectorAll("input[type=date]");
+    dateInputs[0].onchange = e => {
+      cards[index].startDate = e.target.value;
+      saveCards(cards);
+    };
+    dateInputs[1].onchange = e => {
+      cards[index].completionDate = e.target.value;
+      saveCards(cards);
+    };
+
+    /* Notes */
+    cardEl.querySelector("textarea").onblur = e => {
+      cards[index].notes = e.target.value;
+      saveCards(cards);
+    };
+
+    /* View Art */
+    cardEl.querySelector(".view-art").onclick = () => {
+      window.location.href = "art.html";
+    };
+
+    /* Reset project */
+    cardEl.querySelector(".reset").onclick = () => {
+      cards[index] = createEmptyCard();
+      saveCards(cards);
       renderCards();
-    }
-  };
+    };
 
-  document.getElementById("year").textContent = new Date().getFullYear();
+    container.appendChild(cardEl);
+  });
+}
+
+document.getElementById("addCard").onclick = () => {
+  const cards = loadCards();
+  cards.push(createEmptyCard());
+  saveCards(cards);
   renderCards();
+};
+
+document.getElementById("resetAll").onclick = () => {
+  if (confirm("Reset all projects?")) {
+    localStorage.removeItem(STORAGE_KEY);
+    renderCards();
+  }
+};
+
+document.getElementById("year").textContent = new Date().getFullYear();
+renderCards();
 </script>
 
 </body>
