@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="styles/art.css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
 </head>
 <body>
 
@@ -28,8 +29,7 @@
 <section class="jumbotron">
   <div>
     <img src="images/susan.jpg" alt="Picture of Artist Susan" class="jumbotron-avatar">
-   <h1>Artist: <span class="artist-name">Susan</span></h1>
-
+    <h1>Artist: <span class="artist-name">Susan</span></h1>
     <p>Track every art project from idea to completion.</p>
   </div>
 </section>
@@ -47,6 +47,12 @@
   <div class="art-viewer" id="artViewer"></div>
 </main>
 
+<!-- Modal -->
+<div id="imageModal" class="modal">
+  <span class="modal-close">&times;</span>
+  <img class="modal-content" id="modalImg" alt="Enlarged artwork" title="Enlarged artwork">
+</div>
+
 <footer class="site-footer">
   <p>Artist: Susan | <span id="year"></span></p>
   <p>
@@ -56,76 +62,93 @@
 </footer>
 
 <script>
-  const STORAGE_KEY = "artCards";
-  const COMPLETED_STAGE_INDEX = 4; // "Completed"
+const STORAGE_KEY = "artCards";
+const COMPLETED_STAGE_INDEX = 4;
 
-  const artDropdown = document.getElementById("artDropdown");
-  const artViewer = document.getElementById("artViewer");
+const artDropdown = document.getElementById("artDropdown");
+const artViewer = document.getElementById("artViewer");
+const modal = document.getElementById("imageModal");
+const modalImg = document.getElementById("modalImg");
+const modalClose = document.querySelector(".modal-close");
 
-  function loadCompletedArt() {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return [];
+function loadCompletedArt() {
+  const data = localStorage.getItem(STORAGE_KEY);
+  if (!data) return [];
+  return JSON.parse(data).filter(card =>
+    card.stages[COMPLETED_STAGE_INDEX] &&
+    card.images[COMPLETED_STAGE_INDEX]?.length > 0
+  );
+}
 
-    return JSON.parse(data).filter(card =>
-      card.stages[COMPLETED_STAGE_INDEX] &&
-      card.images[COMPLETED_STAGE_INDEX] &&
-      card.images[COMPLETED_STAGE_INDEX].length > 0
-    );
+let completedArt = loadCompletedArt();
+
+function populateDropdown() {
+  artDropdown.innerHTML = "";
+
+  if (completedArt.length === 0) {
+    const opt = document.createElement("option");
+    opt.textContent = "-- No Completed Art Yet --";
+    opt.value = "";
+    artDropdown.appendChild(opt);
+    artViewer.innerHTML = "<p>No completed artwork available.</p>";
+    return;
   }
 
-  let completedArt = loadCompletedArt();
-
-  function populateDropdown() {
-    artDropdown.innerHTML = "";
-
-    if (completedArt.length === 0) {
-      const opt = document.createElement("option");
-      opt.textContent = "-- No Completed Art Yet --";
-      opt.value = "";
-      artDropdown.appendChild(opt);
-      artViewer.innerHTML = "<p>No completed artwork available.</p>";
-      return;
-    }
-
-    completedArt.forEach((art, index) => {
-      const opt = document.createElement("option");
-      opt.value = index;
-      opt.textContent = art.title || "Untitled Artwork";
-      artDropdown.appendChild(opt);
-    });
-
-    artDropdown.value = 0;
-    displayImages(0);
-  }
-
-  function displayImages(index) {
-    artViewer.innerHTML = "";
-
-    if (!completedArt[index]) {
-      artViewer.innerHTML = "<p>No artwork selected.</p>";
-      return;
-    }
-
-    completedArt[index].images[COMPLETED_STAGE_INDEX].forEach(imgSrc => {
-      const frame = document.createElement("div");
-      frame.className = "art-frame";
-
-      const img = document.createElement("img");
-      img.src = imgSrc;
-      img.alt = completedArt[index].title || "Completed Artwork";
-
-      frame.appendChild(img);
-      artViewer.appendChild(frame);
-    });
-  }
-
-  artDropdown.addEventListener("change", e => {
-    displayImages(e.target.value);
+  completedArt.forEach((art, index) => {
+    const opt = document.createElement("option");
+    opt.value = index;
+    opt.textContent = art.title || "Untitled Artwork";
+    artDropdown.appendChild(opt);
   });
 
-  document.getElementById("year").textContent = new Date().getFullYear();
+  artDropdown.value = 0;
+  displayImages(0);
+}
 
-  populateDropdown();
+function displayImages(index) {
+  artViewer.innerHTML = "";
+
+  if (!completedArt[index]) {
+    artViewer.innerHTML = "<p>No artwork selected.</p>";
+    return;
+  }
+
+  completedArt[index].images[COMPLETED_STAGE_INDEX].forEach(imgSrc => {
+    const frame = document.createElement("div");
+    frame.className = "art-frame";
+
+    const img = document.createElement("img");
+    img.src = imgSrc;
+    img.alt = completedArt[index].title || "Completed Artwork";
+
+    // Click to enlarge
+    img.onclick = () => {
+      modal.style.display = "block";
+      modalImg.src = imgSrc;
+    };
+
+    frame.appendChild(img);
+    artViewer.appendChild(frame);
+  });
+}
+
+// Close modal
+modalClose.onclick = () => {
+  modal.style.display = "none";
+};
+
+// Close modal on outside click
+modal.onclick = e => {
+  if (e.target === modal) modal.style.display = "none";
+};
+
+artDropdown.addEventListener("change", e => {
+  displayImages(e.target.value);
+});
+
+document.getElementById("year").textContent = new Date().getFullYear();
+
+populateDropdown();
 </script>
 
 </body>
