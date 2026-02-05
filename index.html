@@ -97,6 +97,8 @@
       const cardEl = document.createElement("div");
       cardEl.className = "art-card";
 
+      const isCompleted = card.stages[4] === true;
+
       cardEl.innerHTML = `
         <div class="title-container">
           <input class="title" placeholder="Project Title" value="${card.title}">
@@ -133,14 +135,21 @@
 
         <textarea placeholder="Notes, ideas, reflections...">${card.notes}</textarea>
 
-        <button class="btn reset">🔄 Reset This Project</button>
+        <div class="card-actions">
+          <button class="btn view-art" style="display:${isCompleted ? "inline-block" : "none"}">
+            🎨 View Art
+          </button>
+          <button class="btn reset">🔄 Reset This Project</button>
+        </div>
       `;
 
+      /* Title */
       cardEl.querySelector(".title").onblur = e => {
         cards[index].title = e.target.value;
         saveCards(cards);
       };
 
+      /* Delete */
       cardEl.querySelector(".delete").onclick = () => {
         if (confirm("Delete this project?")) {
           cards.splice(index,1);
@@ -149,13 +158,22 @@
         }
       };
 
+      /* Stage checkboxes */
       cardEl.querySelectorAll(".stages input[type=checkbox]").forEach((box,i)=>{
         box.onchange = e => {
           cards[index].stages[i] = e.target.checked;
+
+          // If Completed checked → set completion date
+          if (STAGES[i] === "Completed" && e.target.checked) {
+            cards[index].completionDate = new Date().toISOString().split("T")[0];
+          }
+
           saveCards(cards);
+          renderCards(); // re-render to show/hide View Art button
         };
       });
 
+      /* Image upload */
       cardEl.querySelectorAll("input[type=file]").forEach(input=>{
         input.onchange = e => {
           const file = e.target.files[0];
@@ -169,21 +187,30 @@
         };
       });
 
+      /* Medium */
       cardEl.querySelector(".medium").onchange = e => {
         cards[index].medium = e.target.value;
         saveCards(cards);
       };
 
+      /* Dates */
       const dateInputs = cardEl.querySelectorAll("input[type=date]");
       dateInputs[0].onchange = e => cards[index].startDate = e.target.value;
       dateInputs[1].onchange = e => cards[index].completionDate = e.target.value;
       dateInputs.forEach(i=>i.onchange = ()=>saveCards(cards));
 
+      /* Notes */
       cardEl.querySelector("textarea").onblur = e => {
         cards[index].notes = e.target.value;
         saveCards(cards);
       };
 
+      /* View Art */
+      cardEl.querySelector(".view-art").onclick = () => {
+        window.location.href = "art.html";
+      };
+
+      /* Reset project */
       cardEl.querySelector(".reset").onclick = () => {
         cards[index] = createEmptyCard();
         saveCards(cards);

@@ -5,27 +5,27 @@
   <title>Art Gallery</title>
 
   <link rel="icon" type="image/png" href="public/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
-<link rel="shortcut icon" href="public/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="public/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="susansArt" />
-<link rel="manifest" href="public/site.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
+  <link rel="shortcut icon" href="public/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="public/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="susansArt" />
+  <link rel="manifest" href="public/site.webmanifest" />
 
-
- <link rel="stylesheet" href="styles/index.css">
+  <link rel="stylesheet" href="styles/index.css">
   <link rel="stylesheet" href="styles/art.css">
- 
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
-    <header class="nav">
-    <a href="index.html" class="back-btn">
-        <img src="public/favicon.ico" alt="Art Tracker Logo" class="nav-avatar"></a>
-    <span class="nav-brand">🎨 Art Gallery</span>
-   </header>
+<header class="nav">
+  <a href="index.html" class="back-btn">
+    <img src="public/favicon.ico" alt="Art Tracker Logo" class="nav-avatar">
+  </a>
+  <span class="nav-brand">🎨 Art Gallery</span>
+</header>
 
-  <section class="jumbotron">
+<section class="jumbotron">
   <div>
     <img src="images/susan.jpg" alt="Picture of Artist Susan" class="jumbotron-avatar">
     <h1>Artist: Susan</h1>
@@ -33,173 +33,98 @@
   </div>
 </section>
 
-  <main class="reading-container">
-    <h1 class="book-title">Select or Upload Final Artwork</h1>
+<main class="reading-container">
+  <h1 class="book-title">Completed Artwork</h1>
 
-    <!-- Dropdown -->
-    <div>
-      <label for="artDropdown">Choose Artwork:</label>
-      <select id="artDropdown" class="form-select"></select>
-      <button type="button" id="deleteArtwork">🗑️ Delete Artwork</button>
-    </div>
+  <!-- Dropdown -->
+  <div>
+    <label for="artDropdown">Choose Artwork:</label>
+    <select id="artDropdown" class="form-select"></select>
+  </div>
 
-    <!-- Upload Images -->
-    <div class="upload-section">
-      <label for="uploadArt">Upload Images for Selected Artwork:</label>
-      <input type="file" id="uploadArt" accept="image/*" multiple>
-    </div>
+  <!-- Art Display Area -->
+  <div class="art-viewer" id="artViewer"></div>
+</main>
 
-    <!-- Art Display Area -->
-    <div class="art-viewer" id="artViewer"></div>
-
-    <!-- Add new artwork -->
-    <div class="new-artwork">
-      <input type="text" id="newArtTitle" placeholder="New artwork title">
-      <button type="button" id="addArtwork">➕ Add Artwork</button>
-    </div>
-  </main>
-
-  <footer class="site-footer">
-    <p>Artist: Susan | <span id="year"></span></p>
-    <p>
-      <a href="privacyPolicy.html">Privacy Policy</a> |
-      <a href="legalDisclaimer.html">Legal Disclaimer</a>
-    </p>
-  </footer>
+<footer class="site-footer">
+  <p>Artist: Susan | <span id="year"></span></p>
+  <p>
+    <a href="privacyPolicy.html">Privacy Policy</a> |
+    <a href="legalDisclaimer.html">Legal Disclaimer</a>
+  </p>
+</footer>
 
 <script>
-  const STORAGE_KEY = "finalArtGallery";
-
-  function loadArt() {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  }
-
-  function saveArt(artArray) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(artArray));
-  }
+  const STORAGE_KEY = "artCards";
+  const COMPLETED_STAGE_INDEX = 4; // "Completed"
 
   const artDropdown = document.getElementById("artDropdown");
   const artViewer = document.getElementById("artViewer");
-  const uploadArt = document.getElementById("uploadArt");
-  const newArtTitle = document.getElementById("newArtTitle");
-  const addArtworkBtn = document.getElementById("addArtwork");
-  const deleteArtworkBtn = document.getElementById("deleteArtwork");
 
-  let artData = loadArt();
+  function loadCompletedArt() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return [];
+
+    return JSON.parse(data).filter(card =>
+      card.stages[COMPLETED_STAGE_INDEX] &&
+      card.images[COMPLETED_STAGE_INDEX] &&
+      card.images[COMPLETED_STAGE_INDEX].length > 0
+    );
+  }
+
+  let completedArt = loadCompletedArt();
 
   function populateDropdown() {
     artDropdown.innerHTML = "";
-    if(artData.length === 0){
-      const option = document.createElement("option");
-      option.textContent = "-- No Artwork --";
-      option.value = "";
-      artDropdown.appendChild(option);
+
+    if (completedArt.length === 0) {
+      const opt = document.createElement("option");
+      opt.textContent = "-- No Completed Art Yet --";
+      opt.value = "";
+      artDropdown.appendChild(opt);
+      artViewer.innerHTML = "<p>No completed artwork available.</p>";
       return;
     }
-    const placeholder = document.createElement("option");
-    placeholder.textContent = "-- Select Artwork --";
-    placeholder.value = "";
-    artDropdown.appendChild(placeholder);
 
-    artData.forEach((art, index)=>{
-      const option = document.createElement("option");
-      option.textContent = art.title;
-      option.value = index;
-      artDropdown.appendChild(option);
+    completedArt.forEach((art, index) => {
+      const opt = document.createElement("option");
+      opt.value = index;
+      opt.textContent = art.title || "Untitled Artwork";
+      artDropdown.appendChild(opt);
     });
+
+    artDropdown.value = 0;
+    displayImages(0);
   }
 
   function displayImages(index) {
     artViewer.innerHTML = "";
-    if(index === "" || !artData[index] || artData[index].images.length === 0){
-      artViewer.innerHTML = "<p>No images uploaded for this artwork yet.</p>";
+
+    if (!completedArt[index]) {
+      artViewer.innerHTML = "<p>No artwork selected.</p>";
       return;
     }
-    artData[index].images.forEach((imgSrc, i)=>{
-      const container = document.createElement("div");
-      container.className = "art-image-container";
+
+    completedArt[index].images[COMPLETED_STAGE_INDEX].forEach(imgSrc => {
+      const frame = document.createElement("div");
+      frame.className = "art-frame";
 
       const img = document.createElement("img");
       img.src = imgSrc;
+      img.alt = completedArt[index].title || "Completed Artwork";
 
-      const delBtn = document.createElement("button");
-      delBtn.textContent = "❌";
-      delBtn.title = "Delete this image";
-      delBtn.onclick = ()=>{
-        if(confirm("Delete this image?")){
-          artData[index].images.splice(i,1);
-          saveArt(artData);
-          displayImages(index);
-        }
-      };
-
-      container.appendChild(img);
-      container.appendChild(delBtn);
-      artViewer.appendChild(container);
+      frame.appendChild(img);
+      artViewer.appendChild(frame);
     });
   }
 
-  artDropdown.addEventListener("change", e=>{
+  artDropdown.addEventListener("change", e => {
     displayImages(e.target.value);
   });
 
-  // Upload multiple images
-  uploadArt.addEventListener("change", e=>{
-    const files = Array.from(e.target.files);
-    const selectedIndex = artDropdown.value;
-    if(selectedIndex === ""){
-      alert("Please select an artwork first.");
-      uploadArt.value = "";
-      return;
-    }
-    files.forEach(file=>{
-      const reader = new FileReader();
-      reader.onload = ev=>{
-        artData[selectedIndex].images.push(ev.target.result);
-        saveArt(artData);
-        displayImages(selectedIndex);
-      };
-      reader.readAsDataURL(file);
-    });
-    uploadArt.value = "";
-  });
-
-  // Add new artwork
-  addArtworkBtn.addEventListener("click", ()=>{
-    const title = newArtTitle.value.trim();
-    if(!title){
-      alert("Enter a title for the new artwork.");
-      return;
-    }
-    artData.push({title, images: []});
-    saveArt(artData);
-    newArtTitle.value = "";
-    populateDropdown();
-  });
-
-  // Delete entire artwork
-  deleteArtworkBtn.addEventListener("click", ()=>{
-    const selectedIndex = artDropdown.value;
-    if(selectedIndex === ""){
-      alert("Please select an artwork first.");
-      return;
-    }
-    if(confirm(`Delete the artwork "${artData[selectedIndex].title}" and all its images?`)){
-      artData.splice(selectedIndex,1);
-      saveArt(artData);
-      populateDropdown();
-      artViewer.innerHTML = "<p>No images uploaded for this artwork yet.</p>";
-    }
-  });
-
-  // Initialize
-  populateDropdown();
-  if(artData.length>0) displayImages(0);
-
-
-  /* Year */
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  populateDropdown();
 </script>
 
 </body>
