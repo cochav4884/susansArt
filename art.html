@@ -1,155 +1,162 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Art Gallery</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Art Gallery</title>
 
-  <link rel="icon" type="image/png" href="public/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
-  <link rel="shortcut icon" href="public/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="public/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="susansArt" />
-  <link rel="manifest" href="public/site.webmanifest" />
+    <link rel="icon" type="image/png" href="public/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
+    <link rel="shortcut icon" href="public/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="public/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="susansArt" />
+    <link rel="manifest" href="public/site.webmanifest" />
 
-  <link rel="stylesheet" href="styles/index.css">
-  <link rel="stylesheet" href="styles/art.css">
+    <link rel="stylesheet" href="styles/index.css" />
+    <link rel="stylesheet" href="styles/art.css" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  
-</head>
-<body>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <header class="nav">
+      <a href="index.html" class="back-btn">
+        <img src="public/favicon.ico" alt="Art Tracker Logo" class="nav-avatar" />
+      </a>
+      <span class="nav-brand">🎨 Art Gallery</span>
+    </header>
 
-<header class="nav">
-  <a href="index.html" class="back-btn">
-    <img src="public/favicon.ico" alt="Art Tracker Logo" class="nav-avatar">
-  </a>
-  <span class="nav-brand">Art Gallery</span>
-</header>
+    <section class="jumbotron">
+      <div>
+        <img src="images/susan.jpg" alt="Picture of Artist Susan" class="jumbotron-avatar" />
+        <h1>Artist: <span class="artist-name">Susan</span></h1>
+        <p>Add to your completed artwork collection.</p>
+      </div>
+    </section>
 
-<section class="jumbotron">
-  <div>
-    <img src="images/susan.jpg" alt="Picture of Artist Susan" class="jumbotron-avatar">
-    <h1>Artist: <span class="artist-name">Susan</span></h1>
-    <p>Add to your completed artwork collection.</p>
-  </div>
-</section>
+    <main class="reading-container">
+      <h1 class="book-title">Completed Artwork</h1>
 
-<main class="reading-container">
-  <h1 class="book-title">Completed Artwork</h1>
+      <!-- Dropdown -->
+      <div>
+        <label for="artDropdown">Choose Artwork:</label>
+        <select id="artDropdown" class="form-select"></select>
+      </div>
 
-  <!-- Dropdown -->
-  <div>
-    <label for="artDropdown">Choose Artwork:</label>
-    <select id="artDropdown" class="form-select"></select>
-  </div>
+      <!-- Art Display Area -->
+      <div class="art-viewer" id="artViewer"></div>
+    </main>
 
-  <!-- Art Display Area -->
-  <div class="art-viewer" id="artViewer"></div>
-</main>
+    <!-- Modal -->
+    <div id="imageModal" class="modal">
+      <span class="modal-close">&times;</span>
+      <img class="modal-content" id="modalImg" alt="Enlarged artwork" title="Enlarged artwork" />
+    </div>
 
-<!-- Modal -->
-<div id="imageModal" class="modal">
-  <span class="modal-close">&times;</span>
-  <img class="modal-content" id="modalImg" alt="Enlarged artwork" title="Enlarged artwork">
-</div>
+    <footer class="site-footer">
+      <p>&copy; 2026 Susan. All rights reserved.</p>
+      <p>
+        <a href="privacyPolicy.html">🔒 Privacy Policy</a> |
+        <a href="legalDisclaimer.html">📄 Legal Disclaimer</a>
+      </p>
+    </footer>
 
-<footer class="site-footer">
-  <p>Artist: Susan | <span id="year"></span></p>
-  <p>
-    <a href="privacyPolicy.html">Privacy Policy</a> |
-    <a href="legalDisclaimer.html">Legal Disclaimer</a>
-  </p>
-</footer>
+    <script>
+      const STORAGE_KEY = "artCards";
+      const COMPLETED_STAGE_INDEX = 4;
 
-<script>
-const STORAGE_KEY = "artCards";
-const COMPLETED_STAGE_INDEX = 4;
+      const artDropdown = document.getElementById("artDropdown");
+      const artViewer = document.getElementById("artViewer");
+      const modal = document.getElementById("imageModal");
+      const modalImg = document.getElementById("modalImg");
+      const modalClose = document.querySelector(".modal-close");
 
-const artDropdown = document.getElementById("artDropdown");
-const artViewer = document.getElementById("artViewer");
-const modal = document.getElementById("imageModal");
-const modalImg = document.getElementById("modalImg");
-const modalClose = document.querySelector(".modal-close");
+      function loadCompletedArt() {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (!data) return [];
+        return JSON.parse(data).filter(
+          card => card.stages[COMPLETED_STAGE_INDEX] // show completed stage even if no images
+        );
+      }
 
-function loadCompletedArt() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (!data) return [];
-  return JSON.parse(data).filter(card =>
-    card.stages[COMPLETED_STAGE_INDEX] &&
-    card.images[COMPLETED_STAGE_INDEX]?.length > 0
-  );
-}
+      let completedArt = loadCompletedArt();
+      let activeIndex = localStorage.getItem("activeArtIndex");
+      activeIndex = activeIndex !== null ? parseInt(activeIndex) : 0;
 
-let completedArt = loadCompletedArt();
+      function populateDropdown() {
+        artDropdown.innerHTML = "";
 
-function populateDropdown() {
-  artDropdown.innerHTML = "";
+        if (completedArt.length === 0) {
+          const opt = document.createElement("option");
+          opt.textContent = "-- No Completed Art Yet --";
+          opt.value = "";
+          artDropdown.appendChild(opt);
+          artViewer.innerHTML = "<p>No completed artwork available.</p>";
+          return;
+        }
 
-  if (completedArt.length === 0) {
-    const opt = document.createElement("option");
-    opt.textContent = "-- No Completed Art Yet --";
-    opt.value = "";
-    artDropdown.appendChild(opt);
-    artViewer.innerHTML = "<p>No completed artwork available.</p>";
-    return;
-  }
+        completedArt.forEach((art, index) => {
+          const opt = document.createElement("option");
+          opt.value = index;
+          opt.textContent = art.title || "Untitled Artwork";
+          artDropdown.appendChild(opt);
+        });
 
-  completedArt.forEach((art, index) => {
-    const opt = document.createElement("option");
-    opt.value = index;
-    opt.textContent = art.title || "Untitled Artwork";
-    artDropdown.appendChild(opt);
-  });
+        // Preselect active card
+        if (activeIndex >= 0 && activeIndex < completedArt.length) {
+          artDropdown.value = activeIndex;
+        } else {
+          artDropdown.value = 0;
+        }
 
-  artDropdown.value = 0;
-  displayImages(0);
-}
+        displayImages(artDropdown.value);
+      }
 
-function displayImages(index) {
-  artViewer.innerHTML = "";
+      function displayImages(index) {
+        artViewer.innerHTML = "";
 
-  if (!completedArt[index]) {
-    artViewer.innerHTML = "<p>No artwork selected.</p>";
-    return;
-  }
+        if (!completedArt[index]) {
+          artViewer.innerHTML = "<p>No artwork selected.</p>";
+          return;
+        }
 
-  completedArt[index].images[COMPLETED_STAGE_INDEX].forEach(imgSrc => {
-    const frame = document.createElement("div");
-    frame.className = "art-frame";
+        const images = completedArt[index].images[COMPLETED_STAGE_INDEX] || [];
+        if (images.length === 0) {
+          artViewer.innerHTML = "<p>No images uploaded for this artwork.</p>";
+          return;
+        }
 
-    const img = document.createElement("img");
-    img.src = imgSrc;
-    img.alt = completedArt[index].title || "Completed Artwork";
+        images.forEach((imgSrc) => {
+          const frame = document.createElement("div");
+          frame.className = "art-frame";
 
-    // Click to enlarge
-    img.onclick = () => {
-      modal.style.display = "block";
-      modalImg.src = imgSrc;
-    };
+          const img = document.createElement("img");
+          img.src = imgSrc;
+          img.alt = completedArt[index].title || "Completed Artwork";
 
-    frame.appendChild(img);
-    artViewer.appendChild(frame);
-  });
-}
+          img.onclick = () => {
+            modal.style.display = "block";
+            modalImg.src = imgSrc;
+          };
 
-// Close modal
-modalClose.onclick = () => {
-  modal.style.display = "none";
-};
+          frame.appendChild(img);
+          artViewer.appendChild(frame);
+        });
+      }
 
-// Close modal on outside click
-modal.onclick = e => {
-  if (e.target === modal) modal.style.display = "none";
-};
+      // Close modal
+      modalClose.onclick = () => {
+        modal.style.display = "none";
+      };
 
-artDropdown.addEventListener("change", e => {
-  displayImages(e.target.value);
-});
+      // Close modal on outside click
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.style.display = "none";
+      };
 
-document.getElementById("year").textContent = new Date().getFullYear();
+      artDropdown.addEventListener("change", (e) => {
+        displayImages(e.target.value);
+      });
 
-populateDropdown();
-</script>
-
-</body>
+      populateDropdown();
+    </script>
+  </body>
 </html>

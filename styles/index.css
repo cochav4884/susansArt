@@ -50,11 +50,11 @@ header.nav {
   object-fit: cover;
   border-radius: 50%;
   border: 4px solid var(--red-dark);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .artist-name {
-  font-family: 'Bookman Old Style', serif;
+  font-family: "Bookman Old Style", serif;
   font-size: 2.2rem;
   color: var(--red-dark);
 }
@@ -182,12 +182,25 @@ input:focus {
   margin-top: 2rem;
 }
 
-/* Footer */
-footer {
-  text-align: center;
-  padding: 1rem;
+/* =====================
+   FOOTER
+===================== */
+.site-footer {
   background: var(--grey-dark);
   color: var(--white);
+  text-align: center;
+  padding: 1.25rem;
+  margin-top: 2rem;
+}
+
+.site-footer a {
+  color: var(--red-soft);
+  text-decoration: none;
+  margin: 0 0.5rem;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
 }
 
 /* Medium checkboxes */
