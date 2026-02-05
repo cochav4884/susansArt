@@ -10,7 +10,9 @@
   --white: #ffffff;
 }
 
-/* RESET */
+/* =====================
+   RESET
+===================== */
 * {
   box-sizing: border-box;
   font-family: system-ui, sans-serif;
@@ -19,24 +21,40 @@
 }
 
 body {
-  background: var(--grey-light);
+  background: var(--red-soft);
   color: var(--grey-dark);
 }
 
-/* NAV HEADER */
-
+/* =====================
+   HEADER / NAV
+===================== */
 header.nav {
-  background: #8b1e1e;          /* deep red */
-  color: #ffffff;
-  padding: 1rem;
+  background: var(--red-dark);
+  color: var(--white);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
 }
 
 .nav-brand {
   font-size: 1.4rem;
   font-weight: 700;
+  text-align: left;
 }
 
-/* MAIN CONTENT */
+.back-btn {
+  color: var(--white);
+  text-decoration: none;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+}
+
+/* =====================
+   MAIN CONTENT
+===================== */
 .reading-container {
   max-width: 900px;
   margin: 2rem auto;
@@ -51,7 +69,9 @@ header.nav {
   margin-bottom: 1rem;
 }
 
-/* ART SELECTION DROPDOWN */
+/* =====================
+   ART SELECTION DROPDOWN
+===================== */
 .reading-container select.form-select {
   width: 100%;
   padding: 0.6rem;
@@ -69,9 +89,17 @@ header.nav {
   border-color: var(--red-dark);
 }
 
-/* ART IMAGE VIEWER */
+/* =====================
+   ART VIEWER
+===================== */
 .art-viewer {
+  margin-top: 2rem;
   text-align: center;
+}
+
+.art-image-container {
+  position: relative;
+  display: inline-block;
 }
 
 #artImage {
@@ -80,11 +108,30 @@ header.nav {
   border-radius: 16px;
   border: 2px solid var(--grey-medium);
   background: var(--white);
-  margin-top: 1rem;
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 
-/* BACK TO TOP BUTTON */
+/* Delete / Replace Image Button */
+.art-image-container button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(176, 42, 42, 0.85);
+  border: none;
+  color: var(--white);
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.art-image-container button:hover {
+  background: var(--red-dark);
+}
+
+/* =====================
+   BACK TO TOP BUTTON
+===================== */
 #backToTop {
   display: none;
   position: fixed;
@@ -106,7 +153,9 @@ header.nav {
   background: var(--grey-dark);
 }
 
-/* FOOTER */
+/* =====================
+   FOOTER
+===================== */
 .site-footer {
   background: var(--grey-dark);
   color: var(--white);
@@ -125,20 +174,18 @@ header.nav {
   text-decoration: underline;
 }
 
-/* RESPONSIVE */
+/* =====================
+   RESPONSIVE
+===================== */
 @media (max-width: 768px) {
-  .nav {
+  header.nav {
     flex-direction: column;
+    align-items: flex-start;
     gap: 0.5rem;
-    text-align: center;
   }
 
-  .nav .back-btn {
-    align-self: flex-start;
-  }
-
-  .nav .nav-brand {
-    font-size: 1.1rem;
+  .nav-brand {
+    font-size: 1.2rem;
   }
 }
 
@@ -152,42 +199,3 @@ header.nav {
     margin: 0.25rem 0;
   }
 }
-
-/*=============================
-ART VIEWER SPECIFIC STYLES
-==============================*/
-    .art-viewer {
-      margin-top: 2rem;
-      text-align: center;
-    }
-
-    .art-viewer img {
-      max-width: 100%;
-      max-height: 80vh;
-      border-radius: 12px;
-      border: 2px solid #ccc;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    }
-
-    .back-btn {
-      color: #fff;
-      text-decoration: none;
-      margin-right: 1rem;
-    }
-
-    .art-image-container {
-      position: relative;
-      margin-bottom: 1rem;
-    }
-    .art-image-container button {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background: rgba(255,0,0,0.7);
-      border: none;
-      color: white;
-      padding: 0.25rem 0.5rem;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-  

@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <title>Art Tracker</title>
 
+  <link rel="icon" type="image/png" href="public/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
+  <link rel="shortcut icon" href="public/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="public/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="susansArt" />
+  <link rel="manifest" href="public/site.webmanifest" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <link rel="stylesheet" href="styles/index.css">
@@ -12,11 +19,15 @@
 <body>
 
 <header class="nav">
-  <span class="nav-brand">🎨 Art Tracker</span>
+  <a href="index.html" class="back-btn">
+    <img src="public/favicon.ico" alt="Art Tracker Logo" class="nav-avatar">
+  </a>
+  <span class="nav-brand"> Art Tracker </span>
 </header>
 
 <section class="jumbotron">
   <div>
+    <img src="images/susan.jpg" alt="Picture of Artist Susan" class="jumbotron-avatar">
     <h1>Artist: Susan</h1>
     <p>Track every art project from idea to completion.</p>
   </div>
@@ -26,13 +37,17 @@
   <section id="cardsContainer"></section>
 
   <div class="controls">
-    <button id="addCard">➕ Add Project</button>
-    <button id="resetAll">🔄 Reset All</button>
+    <button type="button" id="addCard">➕ Add Project</button>
+    <button type="button" id="resetAll">🔄 Reset All</button>
   </div>
 </main>
 
-<footer>
-  <p>Art Tracker | <span id="year"></span></p>
+<footer class="site-footer">
+  <p>Artist: Susan | <span id="year"></span></p>
+  <p>
+    <a href="privacyPolicy.html">Privacy Policy</a> |
+    <a href="legalDisclaimer.html">Legal Disclaimer</a>
+  </p>
 </footer>
 
 <script>

@@ -228,8 +228,8 @@ main {
     }
 
     header.nav {
-      background: var(--grey-dark);
-      color: var(--red-main);
+      background: var(--red-dark);
+      color: var(--white);
       padding: 1rem;
     }
 
@@ -326,6 +326,6 @@ main {
     footer {
       text-align: center;
       padding: 1rem;
-      background: var(--red-dark);
+      background: var(--grey-dark);
       color: var(--white);
     }
