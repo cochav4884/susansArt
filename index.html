@@ -113,52 +113,61 @@ function renderCards() {
 
     const isCompleted = card.stages[4] === true;
 
-    cardEl.innerHTML = `
-      <div class="title-container">
-        <input class="title" placeholder="Project Title" value="${card.title}">
-        <button class="btn delete">🗑️</button>
-      </div>
+cardEl.innerHTML = `
+  <div class="title-container">
+    <input class="title" placeholder="Project Title" value="${card.title}">
+    <button class="btn delete">🗑️</button>
+  </div>
 
-      <div class="stages">
-        ${STAGES.map((s,i)=>`
-          <div class="stage-block">
-            <label>
-              <input type="checkbox" ${card.stages[i] ? "checked" : ""}>
-              ${s}
-            </label>
-            <input type="file" accept="image/*" data-stage="${i}" multiple>
-            <div class="image-preview">
-              ${(card.images[i] || []).map((img, imgIndex) => `
-                <div class="preview-container">
-                  <img src="${img}" alt="Stage ${s} Image">
-                  <button class="remove-image" data-stage="${i}" data-index="${imgIndex}">❌</button>
-                </div>
-              `).join("")}
-            </div>
+  <div class="card-content">
+    <div class="stages">
+      ${STAGES.map((s,i)=>`
+        <div class="stage-block">
+          <label>
+            <input type="checkbox" ${card.stages[i] ? "checked" : ""}>
+            ${s}
+          </label>
+          <input type="file" accept="image/*" data-stage="${i}" multiple>
+          <div class="image-preview">
+            ${(card.images[i] || []).map((img, imgIndex) => `
+              <div class="preview-container">
+                <img src="${img}" alt="Stage ${s} Image">
+                <button class="remove-image" data-stage="${i}" data-index="${imgIndex}">❌</button>
+              </div>
+            `).join("")}
           </div>
-        `).join("")}
-      </div>
+        </div>
+      `).join("")}
+    </div>
 
-      <div class="extras">
-        <label>Medium
-          <select class="medium">
-            <option value="">Select</option>
-            ${["Pencil","Paint","Digital","Charcoal","Mixed Media","Other"]
-              .map(m=>`<option ${card.medium===m?"selected":""}>${m}</option>`).join("")}
-          </select>
-        </label>
+    <div class="extras">
+      <label>Medium
+        <select class="medium">
+          <option value="">Select</option>
+          ${["Pencil","Paint","Digital","Charcoal","Mixed Media","Other"]
+            .map(m=>`<option ${card.medium===m?"selected":""}>${m}</option>`).join("")}
+        </select>
+      </label>
 
-        <label>Start Date <input type="date" value="${card.startDate}"></label>
-        <label>Completion Date <input type="date" value="${card.completionDate}"></label>
-      </div>
+      <label>Start Date <input type="date" value="${card.startDate}"></label>
+      <label>Completion Date <input type="date" value="${card.completionDate}"></label>
+    </div>
 
-      <textarea placeholder="Notes, ideas, reflections...">${card.notes}</textarea>
+    <textarea placeholder="Notes, ideas, reflections...">${card.notes}</textarea>
 
-      <div class="card-actions">
-        <button class="btn view-art" style="display:${isCompleted ? "inline-block" : "none"}">🎨 View Art</button>
-        <button class="btn reset">🔄 Reset This Project</button>
-      </div>
-    `;
+    <div class="card-actions">
+      <button class="btn view-art" style="display:${isCompleted ? "inline-block" : "none"}">🎨 View Art</button>
+      <button class="btn reset">🔄 Reset This Project</button>
+    </div>
+  </div>
+`;
+
+// Toggle collapse when title container is clicked
+cardEl.querySelector(".title-container").onclick = e => {
+  if (e.target.classList.contains("delete")) return; // don't toggle if delete clicked
+  cardEl.classList.toggle("collapsed");
+};
+
 
     // Title
     cardEl.querySelector(".title").onblur = e => {

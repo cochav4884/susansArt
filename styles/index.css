@@ -1,3 +1,15 @@
+:root {
+  --red-dark: #8b1e1e;
+  --red-main: #b02a2a;
+  --red-soft: #f2dede;
+
+  --grey-dark: #1a1a1a;
+  --grey-medium: #6c757d;
+  --grey-light: #f5f5f5;
+
+  --white: #ffffff;
+}
+
 * {
   box-sizing: border-box;
   font-family: system-ui, sans-serif;
@@ -5,15 +17,15 @@
 
 body {
   margin: 0;
-  background: #f5f5f5;          /* light grey background */
-  color: #1a1a1a;               /* near-black text */
+  background: var(--red-soft);
+  color: var(--grey-dark);
 }
 
+/* Header */
 header.nav {
-  background: #8b1e1e;          /* deep red */
-  color: #ffffff;
+  background: var(--red-dark);
+  color: var(--white);
   padding: 1rem;
-  margin-bottom: 2rem;
 }
 
 .nav-brand {
@@ -21,52 +33,94 @@ header.nav {
   font-weight: 700;
 }
 
+/* Jumbotron */
+.jumbotron {
+  display: flex;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: var(--grey-light);
+  align-items: center;
+  border-radius: 16px;
+  flex-wrap: wrap;
+}
 
+.jumbotron-avatar {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid var(--red-dark);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.artist-name {
+  font-family: 'Bookman Old Style', serif;
+  font-size: 2.2rem;
+  color: var(--red-dark);
+}
+
+/* Main content */
 main {
   padding: 2rem;
 }
 
+/* Collapsible Card */
 .art-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e0e0e0;
+  background: var(--white);
+  border: 2px solid var(--red-main);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
+.art-card .card-content {
+  margin-top: 0.5rem;
+}
+
+.art-card.collapsed .card-content {
+  display: none; /* instant collapse */
+}
+
+/* Title container */
 .title-container {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
   gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 
-.title {
+.title-container input.title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-bottom: 1px solid var(--grey-medium);
   flex: 1;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #b0b0b0;
-  border-radius: 6px;
+  margin-right: 0.5rem;
+  background: transparent;
 }
 
-.title:focus {
+.title-container input.title:focus {
   outline: none;
-  border-color: #8b1e1e;
 }
 
+/* Buttons */
 .btn {
   padding: 0.4rem 0.6rem;
   cursor: pointer;
-  background: #8b1e1e;
-  color: #ffffff;
+  background: var(--red-dark);
+  color: var(--white);
   border: none;
   border-radius: 6px;
 }
 
 .btn:hover {
-  background: #a32626;          /* brighter red on hover */
+  background: var(--red-main);
 }
 
+/* Stages */
 .stages {
   display: grid;
   gap: 1rem;
@@ -74,14 +128,10 @@ main {
 }
 
 .stage-block {
-  border: 1px solid #cccccc;
+  border: 1px solid var(--grey-medium);
   border-radius: 12px;
   padding: 0.75rem;
   background: #fafafa;
-}
-
-.stage-block label {
-  font-weight: 600;
 }
 
 .image-preview {
@@ -96,10 +146,11 @@ main {
   height: 80px;
   object-fit: cover;
   border-radius: 8px;
-  border: 1px solid #999999;
+  border: 1px solid var(--grey-medium);
   cursor: pointer;
 }
 
+/* Extras, dates, textarea */
 .dates,
 .extras {
   display: flex;
@@ -108,231 +159,33 @@ main {
   margin-top: 1rem;
 }
 
-input[type="date"],
-select,
-textarea {
-  border: 1px solid #b0b0b0;
-  border-radius: 6px;
-  padding: 0.4rem;
-}
-
 textarea {
   width: 100%;
   min-height: 80px;
   margin-top: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--grey-medium);
+  padding: 0.4rem;
 }
 
 textarea:focus,
 select:focus,
 input:focus {
   outline: none;
-  border-color: #8b1e1e;
+  border-color: var(--red-dark);
 }
 
+/* Controls */
 .controls {
   display: flex;
   gap: 1rem;
   margin-top: 2rem;
 }
 
-/* SITE FOOTER */
-.site-footer {
-  background-color: #1a1a1a;        /* dark footer background */
-  color: #ffffff;                   /* white text */
+/* Footer */
+footer {
   text-align: center;
-  padding: 1.5rem 2rem;
-  font-size: 0.9rem;
-  border-top: 2px solid #8b1e1e;   /* subtle top border in deep red */
+  padding: 1rem;
+  background: var(--grey-dark);
+  color: var(--white);
 }
-
-.site-footer p {
-  margin: 0.3rem 0;
-}
-
-.site-footer a {
-  color: #ffe6e6;                   /* light red links */
-  text-decoration: none;
-  transition: color 0.2s ease-in-out;
-}
-
-.site-footer a:hover {
-  color: #ff9999;                   /* brighter red on hover */
-  text-decoration: underline;
-}
-
-@media (max-width: 600px) {
-  .site-footer {
-    font-size: 0.8rem;
-    padding: 1rem;
-  }
-}
-
-
-.jumbotron {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 2rem;
-  background: #ffe6e6; /* light red/pink background for art section */
-  border-radius: 16px;
-  flex-wrap: wrap;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-.jumbotron-avatar {
-  width: 120px;          /* control size */
-  height: 120px;
-  object-fit: cover;      /* keeps aspect ratio */
-  border-radius: 50%;     /* circular frame */
-  border: 4px solid #b30000; /* dark red frame */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.jumbotron div h1 {
-  margin: 0.25rem 0 0.5rem;
-  font-size: 1.8rem;
-  color: #800000;  /* dark red text */
-}
-
-.jumbotron div p {
-  margin: 0;
-  color: #4d0000;  /* slightly lighter red for subtitle */
-}
-
-main {
-  margin-top: 2rem;
-}
-
-:root {
-  --red-dark: #8b1e1e;
-  --red-main: #b02a2a;
-  --red-soft: #f2dede;
-
-  --grey-dark: #1a1a1a;
-  --grey-medium: #6c757d;
-  --grey-light: #f5f5f5;
-
-  --white: #ffffff;
-}
-
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: var(--red-soft);
-      color: #2f4f3e;
-    }
-
-    header.nav {
-      background: var(--red-dark);
-      color: var(--white);
-      padding: 1rem;
-    }
-
-    .nav-brand {
-      font-size: 1.4rem;
-      font-weight: 700;
-    }
-
-    .jumbotron {
-      display: flex;
-      gap: 1.5rem;
-      padding: 2rem;
-      background: var(--grey-light);
-      align-items: center;
-    }
-
-    .artist-name {
-  font-family: 'Bookman Old Style', serif;
-  font-size: 2.2rem; /* adjust as needed */
-  color: var(--red-dark); /* optional */
-}
-
-
-    main {
-      padding: 2rem;
-    }
-
-    .art-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-    }
-
-    .title-container {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .title {
-      flex: 1;
-      padding: 0.5rem;
-      font-size: 1rem;
-    }
-
-    .btn {
-      padding: 0.4rem 0.6rem;
-      cursor: pointer;
-    }
-
-    .stages {
-      display: grid;
-      gap: 1rem;
-      margin: 1rem 0;
-    }
-
-    .stage-block {
-      border: 1px solid var(--grey-medium);
-      border-radius: 12px;
-      padding: 0.75rem;
-    }
-
-    .image-preview {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-top: 0.5rem;
-    }
-
-    .image-preview img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid var(--grey-medium);
-      cursor: pointer;
-    }
-
-    .dates,
-    .extras {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 80px;
-      margin-top: 0.5rem;
-    }
-
-    .controls {
-      display: flex;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background: var(--grey-dark);
-      color: var(--white);
-    }
